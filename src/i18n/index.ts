@@ -19,10 +19,9 @@ function getStoredLanguage(): SupportedLanguage | null {
 }
 
 /**
- * First-run language, taken from the OS/browser locale list. Only reached when
- * neither the saved setting nor localStorage has a value, so an existing user's
- * choice is never overridden. Traditional-Chinese regions (TW/HK/MO) and the
- * Hant script map to zh-TW; any other Chinese tag maps to zh.
+ * First-run language, from the OS locale list. Only reached when neither the
+ * saved setting nor localStorage has a value, so an existing user's choice is
+ * never overridden.
  */
 function detectLanguage(): SupportedLanguage {
   const tags = navigator.languages?.length
@@ -32,6 +31,8 @@ function detectLanguage(): SupportedLanguage {
   for (const tag of tags) {
     const lower = tag.toLowerCase();
     if (lower.startsWith("zh")) {
+      // An explicit script wins over the region, so zh-Hans-HK stays Simplified.
+      if (lower.includes("hans")) return "zh";
       return /hant|-(tw|hk|mo)\b/.test(lower) ? "zh-TW" : "zh";
     }
     if (lower.startsWith("en")) return "en";
